@@ -433,9 +433,7 @@ date_default_timezone_set('Asia/Jakarta');
 						case 'tolak_laporan':
 							include "laporan/tolak_laporan.php";
 							break;
-							case 'laporan_kegiatan':
-							include "laporan_kegiatan.php";
-							break;
+							
 							//anggota
 						case 'add_anggota':
 							include "staff/add_anggota.php";
