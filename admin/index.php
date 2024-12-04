@@ -80,6 +80,13 @@ date_default_timezone_set('Asia/Jakarta');
 					</a>
 				</li>
 				<li>
+					<a href="index.php?page=aktivitas_admin">
+						<div class="parent-icon"><i class='bx bx-time'></i>
+						</div>
+						<div class="menu-title">Aktivitas Admin</div>
+					</a>
+				</li>
+				<li>
 				<li class="menu-label">Menu Laporan</li>
 				<li>
 					<a href="javascript:;" class="has-arrow">
@@ -416,6 +423,9 @@ date_default_timezone_set('Asia/Jakarta');
 							break;
 						case 'laporan_kegiatan':
 							include "laporan_kegiatan.php";
+							break;
+						case 'aktivitas_admin':
+							include "aktivitas_admin.php";
 							break;
 						case 'confirm_laporan':
 							include "laporan/confirm_laporan.php";

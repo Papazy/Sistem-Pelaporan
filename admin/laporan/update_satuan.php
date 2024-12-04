@@ -24,6 +24,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Menjalankan query dan memeriksa apakah berhasil
     if (mysqli_query($conn, $query)) {
+
+        // Simpan Aktivitas Admin
+        $current_user = $_SESSION['nama'];
+        $aktivitas = "Mengubah satuan dengan ID: $satuan_id";
+        $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
+        mysqli_query($conn, $insert_aktivitas);
+
         // Redirect ke halaman yang sama atau halaman lain setelah update berhasil
         header("Location: ../index.php?page=add_satuan&status=success&status_type=2");
         exit();

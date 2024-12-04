@@ -40,6 +40,13 @@
         }else{
         mysqli_query($conn, "INSERT INTO staff(id_staff,nrp,nama,jenis_kelamin,pangkat,password,tipe)
         VALUES ('','$nrp','$nama','$jk','$pangkat','$pass','$tipe')");
+
+        // Simpan Aktivitas Admin
+        $current_user = $_SESSION['nama'];
+        $aktivitas = "Menambahkan staff: $nama dengan NRP: $nrp";
+        $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
+        mysqli_query($conn, $insert_aktivitas);
+
         echo '
         <div class="alert alert-success border-0 bg-success alert-dismissible fade show py-2">
         <div class="d-flex align-items-center">

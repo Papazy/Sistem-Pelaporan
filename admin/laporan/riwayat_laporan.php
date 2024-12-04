@@ -76,6 +76,13 @@
                     $no = 1;
                     $id_staff = $_SESSION['id_staff'];
                     $query = mysqli_query($conn, "SELECT * FROM laporan_kegiatan as a JOIN satuan as b ON b.satuan = a.satuan JOIN jenis_kegiatan as c ON c.kegiatan = a.kegiatan  WHERE a.created_by = '$id_staff'");
+
+                    // Simpan Aktivitas Admin
+                    $current_user = $_SESSION['nama'];
+                    $aktivitas = "Melihat riwayat laporan";
+                    $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
+                    mysqli_query($conn, $insert_aktivitas);
+                    
                     while ($data = mysqli_fetch_array($query)) { ?>
                         <tr>
                             <td>

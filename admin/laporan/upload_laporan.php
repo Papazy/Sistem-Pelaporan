@@ -34,6 +34,11 @@ if (isset($_POST['submit'])) {
             $move = move_uploaded_file($tempLocation, '../file/'. $alias_pdf);
             $result = mysqli_query($conn, "INSERT INTO pdf_kegiatan (id_pdf,id_laporan,pdf) VALUES ('','$id_laporan','$alias_pdf')");
         }
+        // Simpan Aktivitas Admin
+        $current_user = $_SESSION['nama'];
+        $aktivitas = "Mengirimkan laporan kegiatan ID: $id_laporan";
+        $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
+        mysqli_query($conn, $insert_aktivitas);
 }
 ?>
 <div class="row">
