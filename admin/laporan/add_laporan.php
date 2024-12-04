@@ -28,7 +28,7 @@ if (isset($_POST['submit'])) {
 
     // Simpan Aktivitas Admin
     $current_user = $_SESSION['nama'];
-    $aktivitas = "Menambahkan laporan kegiatan: $judul";
+    $aktivitas = "tambah laporan kegiatan: `$judul`";
     $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
     mysqli_query($conn, $insert_aktivitas);
 

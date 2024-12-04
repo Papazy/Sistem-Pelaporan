@@ -22,12 +22,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 edited_at = '$edited_at'
               WHERE satuan = '$satuan_id'";
 
+    $query_sebelum = "SELECT * FROM satuan WHERE satuan='$satuan_id'";
+    $result_sebelum = mysqli_query($conn, $query_sebelum);
+    $data_satuan_sebelum = mysqli_fetch_assoc($result_sebelum);
+    $judul_satuan_sebelum = $data_satuan_sebelum['judul_satuan'];
+
     // Menjalankan query dan memeriksa apakah berhasil
     if (mysqli_query($conn, $query)) {
 
         // Simpan Aktivitas Admin
         $current_user = $_SESSION['nama'];
-        $aktivitas = "Mengubah satuan dengan ID: $satuan_id";
+        $aktivitas = "ubah satuan: `$judul_satuan_sebelum` menjadi `$judul_satuan`";
         $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
         mysqli_query($conn, $insert_aktivitas);
 

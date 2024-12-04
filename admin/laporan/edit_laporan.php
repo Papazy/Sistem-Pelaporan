@@ -24,11 +24,17 @@ if (isset($_POST['submit'])) {
     $tgl = $_POST['tgl'];
     $mytextarea = $_POST['mytextarea'];
     $created_at = date('Y-m-d');
+
+    $query = "SELECT * FROM laporan_kegiatan WHERE id_laporan = '$id_laporan'";
+    $result = mysqli_query($conn, $query);
+    $row = mysqli_fetch_assoc($result);
+    $judul_laporan_sebelum = $row['judul_laporan'];
+
     mysqli_query($conn,"UPDATE laporan_kegiatan SET judul_laporan='$judul',satuan='$satuan',kegiatan='$kegiatan',lokasi='$lokasi',tgl='$tgl',isi='$mytextarea',created_at='$created_at',status='PENDING' WHERE id_laporan='$id_laporan'");
 
     // Simpan Aktivitas Admin
     $current_user = $_SESSION['nama'];
-    $aktivitas = "Mengubah laporan kegiatan ID: $id_laporan";
+    $aktivitas = "ubah laporan kegiatan: `$judul_laporan_sebelum` menjadi `$judul`";
     $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
     mysqli_query($conn, $insert_aktivitas);
 

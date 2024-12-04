@@ -3,6 +3,7 @@ error_reporting(0);
 include "../conn/conn.php";
 $id_laporan = $_GET['id'];
 $get_data = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM laporan_kegiatan WHERE id_laporan = '$id_laporan'"));
+$judul_laporan = $get_data['judul_laporan'];
 ?>
 <!--breadcrumb-->
 <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
@@ -26,6 +27,11 @@ if (isset($_POST['submit'])) {
             $alias_foto = date('d-m-Y').'-'.$fileName ; 
             $move = move_uploaded_file($tempLocation, '../file/'. $alias_foto);
             $result = mysqli_query($conn, "INSERT INTO foto_kegiatan (id_foto,id_laporan,foto) VALUES ('','$id_laporan','$alias_foto')");
+            // Simpan Aktivitas Admin
+            $current_user = $_SESSION['nama'];
+            $aktivitas = "tambah foto kegiatan: `$fileName` pada laporan `$judul_laporan`";
+            $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
+            mysqli_query($conn, $insert_aktivitas);
         }
         foreach ($_FILES['pdf']['name'] as $id=>$val) {
             $fileName       = $_FILES['pdf']['name'][$id];
@@ -33,12 +39,13 @@ if (isset($_POST['submit'])) {
             $alias_pdf = date('d-m-Y').'-'.$fileName ; 
             $move = move_uploaded_file($tempLocation, '../file/'. $alias_pdf);
             $result = mysqli_query($conn, "INSERT INTO pdf_kegiatan (id_pdf,id_laporan,pdf) VALUES ('','$id_laporan','$alias_pdf')");
+            // Simpan Aktivitas Admin
+            $current_user = $_SESSION['nama'];
+            $aktivitas = "tambah pdf kegiatan: `$fileName` pada laporan `$judul_laporan`";
+            $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
+            mysqli_query($conn, $insert_aktivitas);
         }
-        // Simpan Aktivitas Admin
-        $current_user = $_SESSION['nama'];
-        $aktivitas = "Mengirimkan laporan kegiatan ID: $id_laporan";
-        $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
-        mysqli_query($conn, $insert_aktivitas);
+
 }
 ?>
 <div class="row">

@@ -1,4 +1,6 @@
 <?php
+session_start();  // Untuk mengakses session yang menyimpan nama user yang sedang login
+
 include "../../conn/conn.php";
 
 if (isset($_POST['judul_kegiatan'])) {
@@ -13,10 +15,15 @@ if (isset($_POST['judul_kegiatan'])) {
               edited_at = NOW()
               WHERE kegiatan = '$kegiatan_id'";
 
+    $query_sebelum = "SELECT * FROM jenis_kegiatan WHERE kegiatan='$kegiatan_id'";
+    $result_sebelum = mysqli_query($conn, $query_sebelum);
+    $data_jenis_kegiatan_sebelum = mysqli_fetch_assoc($result_sebelum);
+    $judul_kegiatan_sebelum = $data_jenis_kegiatan_sebelum['judul_kegiatan'];
     if (mysqli_query($conn, $query)) {
+
         // Simpan Aktivitas Admin
         $current_user = $_SESSION['nama'];
-        $aktivitas = "Mengubah jenis kegiatan dengan ID: $kegiatan_id";
+        $aktivitas = "ubah jenis kegiatan: `$judul_kegiatan_sebelum` menjadi `$judul_kegiatan`";
         $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
         mysqli_query($conn, $insert_aktivitas);
 
