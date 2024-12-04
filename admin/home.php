@@ -1,29 +1,98 @@
 <?php
 include "../conn/conn.php";
+
 function tgl_indo($tanggal)
 {
     $bulan = array(
-        1 =>   'Januari',
-        'Februari',
-        'Maret',
-        'April',
-        'Mei',
-        'Juni',
-        'Juli',
-        'Agustus',
-        'September',
-        'Oktober',
-        'November',
-        'Desember'
+        1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
     );
     $pecahkan = explode('-', $tanggal);
-
-    // variabel pecahkan 0 = tanggal
-    // variabel pecahkan 1 = bulan
-    // variabel pecahkan 2 = tahun
-
     return $pecahkan[2] . ' ' . $bulan[(int)$pecahkan[1]] . ' ' . $pecahkan[0];
 }
+
+$filterType = isset($_GET['filterType']) ? $_GET['filterType'] : '-';
+$filterValue = isset($_GET['filterValue']) ? $_GET['filterValue'] : '-';
+
+$id_staff = $_SESSION['id_staff'] ?? null; 
+$filterCondition = "";
+$filterConditionWithoutAND = "";
+
+// Menambahkan kondisi filter berdasarkan jenis filter
+if ($filterType === 'harian' && $filterValue !== '-') {
+    $filterCondition = "AND DATE(a.created_at) = '$filterValue'";
+    $filterConditionWithoutAND = "WHERE DATE(a.created_at) = '$filterValue'";
+} elseif ($filterType === 'bulanan' && $filterValue !== '-') {
+    $filterCondition = "AND DATE_FORMAT(a.created_at, '%Y-%m') = '$filterValue'";
+    $filterConditionWithoutAND = "WHERE DATE_FORMAT(a.created_at, '%Y-%m') = '$filterValue'";
+} elseif ($filterType === 'tahunan' && $filterValue !== '-') {
+    $filterCondition = "AND YEAR(a.created_at) = '$filterValue'";
+    $filterConditionWithoutAND = "WHERE YEAR(a.created_at) = '$filterValue'";
+}
+
+// Query utama untuk laporan diterima
+$laporanQuery = "
+    SELECT 
+        a.*, 
+        b.judul_satuan, 
+        c.judul_kegiatan 
+    FROM laporan_kegiatan a
+    JOIN satuan b ON b.satuan = a.satuan
+    JOIN jenis_kegiatan c ON c.kegiatan = a.kegiatan
+    WHERE a.status='DITERIMA' $filterCondition
+    ORDER BY a.id_laporan DESC
+";
+
+$laporanData = mysqli_query($conn, $laporanQuery);
+$laporanResult = [];
+$fotoData = [];
+$pdfData = [];
+$idLaporan = [];
+
+// Menyimpan data laporan
+if ($laporanData) {
+    while ($data = mysqli_fetch_assoc($laporanData)) {
+        $idLaporan[] = $data['id_laporan'];
+        $laporanResult[] = $data;
+    }
+}
+
+// Jika ada laporan, fetch foto dan PDF terkait
+if (!empty($idLaporan)) {
+    $idLaporanList = implode(",", array_map('intval', $idLaporan)); // Sanitasi ID
+
+    $fotoQuery = "SELECT * FROM foto_kegiatan WHERE id_laporan IN ($idLaporanList)";
+    $pdfQuery = "SELECT * FROM pdf_kegiatan WHERE id_laporan IN ($idLaporanList)";
+
+    $fotoResult = mysqli_query($conn, $fotoQuery);
+    $pdfResult = mysqli_query($conn, $pdfQuery);
+
+    if ($fotoResult) {
+        while ($foto = mysqli_fetch_assoc($fotoResult)) {
+            $fotoData[$foto['id_laporan']][] = $foto['foto'];
+        }
+    }
+
+    if ($pdfResult) {
+        while ($pdf = mysqli_fetch_assoc($pdfResult)) {
+            $pdfData[$pdf['id_laporan']][] = $pdf['pdf'];
+        }
+    }
+}
+
+// Query untuk statistik
+$statistikQuery = "
+    SELECT 
+        (SELECT COUNT(*) FROM staff) AS total_staff,
+        (SELECT COUNT(*) FROM laporan_kegiatan a WHERE status = 'DITERIMA' $filterCondition) AS total_laporan_diterima,
+        (SELECT COUNT(*) FROM laporan_kegiatan a WHERE status = 'DITOLAK' $filterCondition) AS total_laporan_ditolak,
+        (SELECT COUNT(*) FROM laporan_kegiatan a WHERE status = 'PENDING' $filterCondition) AS total_laporan_pending,
+        (SELECT COUNT(*) FROM laporan_kegiatan a $filterConditionWithoutAND) AS total_laporan
+";
+
+$result = mysqli_query($conn, $statistikQuery);
+$data = mysqli_fetch_assoc($result);
+
 ?>
 <div class="row">
     <div class="col-12">
@@ -33,10 +102,10 @@ function tgl_indo($tanggal)
                     <div class="col-lg-3 col-xl-2">
                         <!-- <a class="btn btn-primary mb-3 mb-lg-0"><i class='bx bxs-home-circle'></i>Dashboard</a> -->
                         <div class="filter-container d-flex align-items-center gap-3">
-                            <div class="form-group mb-0" style="width: 120px;">
+                            <div class="form-group mb-0">
                                 <label for="filterType" class="form-label">Pilih Filter:</label>
-                                <select id="filterType" class="form-control" onchange="updateFilterOptions()" style="width: 120px;">
-                                    <option value="-">-</option>
+                                <select id="filterType" class="form-control" onchange="updateFilterOptions()">
+                                    <option value="-">All</option>
                                     <option value="harian">Harian</option>
                                     <option value="bulanan">Bulanan</option>
                                     <option value="tahunan">Tahunan</option>
@@ -44,10 +113,13 @@ function tgl_indo($tanggal)
                             </div>
                             <div class="form-group mb-0" style="width: 120px;">
                                 <label id="filterOptionsLabel" for="filterOptions" class="form-label">Opsi:</label>
-                                <select id="filterOptions" class="form-control" style="width: 120px;">
-                                    <option value="none">-</option>
+                                <select id="filterOptions" class="form-control" style="width: 120px; z-index: 100">
+                                    <option value="all">-</option>
                                 </select>
                             </div>
+                        </div>
+                        <div class="form-group ms-2">
+                            <button class="btn btn-primary" onclick="filterTable()">Filter</button>
                         </div>
                     </div>
                     <div class="col-lg-9 col-xl-10">
@@ -110,73 +182,185 @@ function tgl_indo($tanggal)
         }
     }
 
-    function updateFilterOptions() {
-        const filterType = document.getElementById("filterType").value;
-        const filterOptions = document.getElementById("filterOptions");
-        const filterOptionsLabel = document.getElementById("filterOptionsLabel");
-        filterOptions.innerHTML = ""; // Clear previous options
-
-        const today = new Date();
-        const currentYear = today.getFullYear();
-        const currentMonth = today.getMonth();
-        const currentDate = today.getDate();
-
-        if (filterType === "harian") {
-            filterOptionsLabel.textContent = "Tanggal:";
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            for (let i = 1; i <= daysInMonth; i++) {
-                const option = document.createElement("option");
-                option.value = i;
-                option.textContent = `${i}`;
-                if (i === currentDate) option.selected = true; // Set default to today's date
-                filterOptions.appendChild(option);
-            }
-        } else if (filterType === "bulanan") {
-            filterOptionsLabel.textContent = "Bulan:";
-            const months = [
-                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-            ];
-            months.forEach((month, index) => {
-                const option = document.createElement("option");
-                option.value = index + 1;
-                option.textContent = month;
-                if (index === currentMonth) option.selected = true; // Set default to this month
-                filterOptions.appendChild(option);
-            });
-        } else if (filterType === "tahunan") {
-            filterOptionsLabel.textContent = "Tahun:";
-            for (let i = 2015; i <= currentYear; i++) {
-                const option = document.createElement("option");
-                option.value = i;
-                option.textContent = `${i}`;
-                if (i === currentYear) option.selected = true; // Set default to this year
-                filterOptions.appendChild(option);
-            }
-        } else {
-            filterOptionsLabel.textContent = "Opsi:"; // Default label
-            const option = document.createElement("option");
-            option.value = "none";
-            option.textContent = "None";
-            option.selected = true; // Set default to None
-            filterOptions.appendChild(option);
-        }
-    }
-
-    // Set default filter on page load
-    window.onload = function() {
-        const filterType = document.getElementById("filterType");
-        filterType.value = "harian"; // Default to Harian
-        updateFilterOptions();
-    };
 
 
     // Update setiap detik
     setInterval(updateJam, 1000);
     updateJam();
 </script>
+<script>
+    function updateFilterOptions() {
+    const filterType = document.getElementById("filterType").value;
+    const filterOptions = document.getElementById("filterOptions");
+    const filterOptionsLabel = document.getElementById("filterOptionsLabel");
+    filterOptions.innerHTML = ""; // Clear previous options
 
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth(); // 0-based index (0 = January)
+    const currentDate = today.getDate();
 
+    if (filterType === "harian") {
+        filterOptionsLabel.textContent = "Tanggal:";
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        for (let i = 1; i <= daysInMonth; i++) {
+            const option = document.createElement("option");
+            option.value = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+            option.textContent = `${i} `;
+            if (i === currentDate) option.selected = true; // Set default to today's date
+            filterOptions.appendChild(option);
+        }
+    } else if (filterType === "bulanan") {
+        filterOptionsLabel.textContent = "Bulan:";
+        const months = [
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
+        months.forEach((month, index) => {
+            const option = document.createElement("option");
+            option.value = `${currentYear}-${String(index + 1).padStart(2, '0')}`;
+            option.textContent = `${month} `;
+            if (index === currentMonth) option.selected = true; // Set default to this month
+            filterOptions.appendChild(option);
+        });
+    } else if (filterType === "tahunan") {
+        filterOptionsLabel.textContent = "Tahun:";
+        for (let i = 2015; i <= currentYear; i++) {
+            const option = document.createElement("option");
+            option.value = i;
+            option.textContent = `${i}`;
+            if (i === currentYear) option.selected = true; // Set default to this year
+            filterOptions.appendChild(option);
+        }
+    } else {
+        filterOptionsLabel.textContent = "Opsi:"; // Default label
+        const option = document.createElement("option");
+        option.value = "-";
+        option.textContent = "-";
+        option.selected = true; // Set default to None
+        filterOptions.appendChild(option);
+    }
+}
+
+function getMonthName(monthIndex) {
+    const months = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+    return months[monthIndex];
+}
+
+function updateFilterOptionsOnLoad(filterType, valueFilter) {
+   
+    const filterOptions = document.getElementById("filterOptions");
+    const filterOptionsLabel = document.getElementById("filterOptionsLabel");
+    console.log('filter Options value', filterOptions)
+    filterOptions.innerHTML = ""; // Clear previous options
+
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth(); // 0-based index (0 = January)
+    const currentDate = today.getDate();
+
+    if (filterType === "harian") {
+        filterOptionsLabel.textContent = "Tanggal:";
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        for (let i = 1; i <= daysInMonth; i++) {
+            const option = document.createElement("option");
+            option.value = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+            option.textContent = `${i} `;
+            if (i === valueFilter) option.selected = true; // Set default to today's date
+            filterOptions.appendChild(option);
+        }
+    } else if (filterType === "bulanan") {
+        filterOptionsLabel.textContent = "Bulan:";
+        const months = [
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
+        months.forEach((month, index) => {
+            const option = document.createElement("option");
+            option.value = `${currentYear}-${String(index + 1).padStart(2, '0')}`;
+            option.textContent = `${month} `;
+            console.log("month", month, " filter", valueFilter)
+            if (month === valueFilter) option.selected = true; // Set default to this month
+            filterOptions.appendChild(option);
+        });
+    } else if (filterType === "tahunan") {
+        filterOptionsLabel.textContent = "Tahun:";
+        for (let i = 2015; i <= currentYear; i++) {
+            const option = document.createElement("option");
+            option.value = i;
+            option.textContent = `${i}`;
+            if (i == valueFilter) option.selected = true; // Set default to this year
+            filterOptions.appendChild(option);
+        }
+    } else {
+        filterOptionsLabel.textContent = "Opsi:"; // Default label
+        const option = document.createElement("option");
+        option.value = "-";
+        option.textContent = "-";
+        option.selected = true; // Set default to all
+        filterOptions.appendChild(option);
+    }
+}
+
+function filterTable() {
+    const filterType = document.getElementById('filterType').value;
+    const filterValue = document.getElementById('filterOptions').value;
+
+    if (filterType !== '-' && filterValue !== 'all') {
+        window.location.href = `index.php?filterType=${filterType}&filterValue=${filterValue}`;
+    } else {
+        window.location.href = `index.php`;
+    }
+}
+
+    // Set default filter on page load
+    window.onload = function() {
+    const filterType = getParameterByName('filterType');
+    const filterValue = getParameterByName('filterValue');
+
+    // Set filterType pada dropdown
+    if (filterType) {
+        document.getElementById('filterType').value = filterType;
+    }
+
+    // Set filterValue pada dropdown atau input terkait
+    let valueFilter
+    if (filterValue) {
+        if (filterType === 'harian') {
+            // Filter harian, ambil hanya tanggal
+            const date = new Date(filterValue);
+            const day = date.getDate();  // Ambil tanggal saja
+            valueFilter = day;  // Set nilai filterOptions ke tanggal
+            
+        } else if (filterType === 'bulanan') {
+            // Filter bulanan, ambil bulan dan tahun
+            const month = filterValue.split('-')[1];  // Ambil bulan (misal 12 untuk Desember)
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const monthName = monthNames[parseInt(month) - 1]; // Mengonversi bulan ke nama bulan
+            valueFilter = monthName;  // Set nilai filterOptions ke nama bulan
+            console.log("month", monthName)
+        } else if (filterType === 'tahunan') {
+            // Filter tahunan, ambil tahun saja
+            valueFilter = filterValue;  // Set nilai filterOptions ke tahun
+        }
+    }
+
+    // Update filter options
+    console.log("filterType", filterType, "filterValue", valueFilter)
+    updateFilterOptionsOnLoad(filterType, valueFilter);
+    
+};
+
+// Fungsi untuk mengambil parameter dari URL query string
+function getParameterByName(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.has(name) ? urlParams.get(name) : null;
+}
+
+</script>
 
 <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
     <div class="col">
@@ -185,15 +369,9 @@ function tgl_indo($tanggal)
                 <div class="d-flex align-items-center">
                     <div>
                         <p class="mb-0 text-white">Anggota Terdaftar</p>
-                        <h4 class="my-1 text-white">
-                            <?php
-                            $data_staff = mysqli_fetch_assoc(mysqli_query($conn, "SELECT count(*) as total from staff"));
-                            echo $data_staff['total'];
-                            ?>
-                        </h4>
+                        <h4 class="my-1 text-white"><?= $data['total_staff']; ?></h4>
                     </div>
-                    <div class="text-white ms-auto font-35"><i class='bx bx-user'></i>
-                    </div>
+                    <div class="text-white ms-auto font-35"><i class='bx bx-user'></i></div>
                 </div>
             </div>
         </div>
@@ -204,15 +382,9 @@ function tgl_indo($tanggal)
                 <div class="d-flex align-items-center">
                     <div>
                         <p class="mb-0 text-white">Total Laporan Diterima</p>
-                        <h4 class="my-1 text-white">
-                            <?php
-                            $data_laporan_diterima = mysqli_fetch_assoc(mysqli_query($conn, "SELECT count(*) as total from laporan_kegiatan WHERE status='DITERIMA'"));
-                            echo $data_laporan_diterima['total'];
-                            ?>
-                        </h4>
+                        <h4 class="my-1 text-white"><?= $data['total_laporan_diterima']; ?></h4>
                     </div>
-                    <div class="text-white ms-auto font-35"><i class='bx bx-trophy'></i>
-                    </div>
+                    <div class="text-white ms-auto font-35"><i class='bx bx-trophy'></i></div>
                 </div>
             </div>
         </div>
@@ -223,15 +395,9 @@ function tgl_indo($tanggal)
                 <div class="d-flex align-items-center">
                     <div>
                         <p class="mb-0 text-white">Total Laporan Ditolak</p>
-                        <h4 class="my-1 text-white">
-                            <?php
-                            $data_laporan_ditolak = mysqli_fetch_assoc(mysqli_query($conn, "SELECT count(*) as total from laporan_kegiatan WHERE status='DITOLAK'"));
-                            echo $data_laporan_ditolak['total'];
-                            ?>
-                        </h4>
+                        <h4 class="my-1 text-white"><?= $data['total_laporan_ditolak']; ?></h4>
                     </div>
-                    <div class="text-white ms-auto font-35"><i class='bx bx-x'></i>
-                    </div>
+                    <div class="text-white ms-auto font-35"><i class='bx bx-x'></i></div>
                 </div>
             </div>
         </div>
@@ -242,15 +408,9 @@ function tgl_indo($tanggal)
                 <div class="d-flex align-items-center">
                     <div>
                         <p class="mb-0 text-white">Total Laporan Ditunda</p>
-                        <h4 class="my-1 text-white">
-                            <?php
-                            $data_laporan_pending = mysqli_fetch_assoc(mysqli_query($conn, "SELECT count(*) as total from laporan_kegiatan WHERE status='PENDING'"));
-                            echo $data_laporan_pending['total'];
-                            ?>
-                        </h4>
+                        <h4 class="my-1 text-white"><?= $data['total_laporan_pending']; ?></h4>
                     </div>
-                    <div class="text-white ms-auto font-35"><i class='bx bx-time'></i>
-                    </div>
+                    <div class="text-white ms-auto font-35"><i class='bx bx-time'></i></div>
                 </div>
             </div>
         </div>
@@ -261,15 +421,9 @@ function tgl_indo($tanggal)
                 <div class="d-flex align-items-center">
                     <div>
                         <p class="mb-0 text-white">Laporan Masuk</p>
-                        <h4 class="my-1 text-white">
-                            <?php
-                            $data_laporan = mysqli_fetch_assoc(mysqli_query($conn, "SELECT count(*) as total from laporan_kegiatan"));
-                            echo $data_laporan['total'];
-                            ?>
-                        </h4>
+                        <h4 class="my-1 text-white"><?= $data['total_laporan']; ?></h4>
                     </div>
-                    <div class="text-white ms-auto font-35"><i class='bx bx-task'></i>
-                    </div>
+                    <div class="text-white ms-auto font-35"><i class='bx bx-task'></i></div>
                 </div>
             </div>
         </div>
@@ -320,63 +474,34 @@ function tgl_indo($tanggal)
                         </thead>
                         <tbody>
                             <?php
-                            include "../conn/conn.php";
                             $no = 1;
-                            $id_staff = $_SESSION['id_staff'];
-                            $query = mysqli_query($conn, "SELECT * FROM laporan_kegiatan as a JOIN satuan as b ON b.satuan = a.satuan JOIN jenis_kegiatan as c ON c.kegiatan = a.kegiatan  WHERE a.status='DITERIMA' ORDER BY a.id_laporan DESC");
-                            while ($data = mysqli_fetch_array($query)) { ?>
-                                <tr>
-                                    <td>
-                                        <center><?= $no++ ?></center>
-                                    </td>
-                                    <td>
-                                        <table class="pdf">
-                                            <?php
-                                            $id_laporan = $data['id_laporan'];
-                                            $query_pdf = mysqli_query($conn, "SELECT * FROM pdf_kegiatan WHERE id_laporan = '$id_laporan'");
-                                            while ($pdf = mysqli_fetch_array($query_pdf)) {
-                                                echo '<a href="../file/' . $pdf['pdf'] . '" download>Unduh PDF</a>';
-                                            ?>
-                                            <?php } ?>
-                                        </table>
-                                    </td>
-                                    <td>
-                                        <table class="table-foto">
-                                            <?php
-                                            $id_laporan = $data['id_laporan'];
-                                            $query_foto = mysqli_query($conn, "SELECT * FROM foto_kegiatan WHERE id_laporan = '$id_laporan'");
-                                            while ($foto = mysqli_fetch_array($query_foto)) {
-                                            ?>
-                                                <tr>
-                                                    <td>
-                                                        <img src="../file/<?= $foto['foto'] ?>" width="150" height="120" class="border rounded cursor-pointer mr-5" alt="">
-                                                    </td>
-                                                </tr>
-                                            <?php } ?>
-                                        </table>
-                                    </td>
-                                    <td>
-                                        <center><b><?= ucwords($data['judul_laporan']) ?></b></center>
-                                    </td>
-                                    <td>
-                                        <center><?= ucfirst($data['judul_satuan']) ?></center>
-                                    </td>
-                                    <td>
-                                        <center><?= ucfirst($data['judul_kegiatan']) ?></center>
-                                    </td>
-                                    <td>
-                                        <?= ucwords($data['lokasi']) ?>
-                                    </td>
-                                    <td>
-                                        <center><?= ucfirst($data['isi']) ?></center>
-                                    </td>
-                                    <td>
-                                        <center><?= tgl_indo(date('Y-m-d', strtotime($data['tgl']))) ?></center>
-                                    </td>
-                                </tr>
-                            <?php
-                            };
+                            foreach ($laporanResult as $data) {
+                                $id_laporan = $data['id_laporan'];
                             ?>
+                                <tr>
+                                    <td><?= $no++ ?></td>
+                                    <td>
+                                        <?php if (!empty($pdfData[$id_laporan])) {
+                                            foreach ($pdfData[$id_laporan] as $pdf) { ?>
+                                                <a href="../file/<?= $pdf ?>" download>Unduh PDF</a><br>
+                                        <?php }
+                                        } ?>
+                                    </td>
+                                    <td>
+                                        <?php if (!empty($fotoData[$id_laporan])) {
+                                            foreach ($fotoData[$id_laporan] as $foto) { ?>
+                                                <img src="../file/<?= $foto ?>" width="150" height="120" class="border rounded" alt=""><br>
+                                        <?php }
+                                        } ?>
+                                    </td>
+                                    <td><b><?= ucwords($data['judul_laporan']) ?></b></td>
+                                    <td><?= ucfirst($data['judul_satuan']) ?></td>
+                                    <td><?= ucfirst($data['judul_kegiatan']) ?></td>
+                                    <td><?= ucwords($data['lokasi']) ?></td>
+                                    <td><?= ucfirst($data['isi']) ?></td>
+                                    <td><?= tgl_indo(date('Y-m-d', strtotime($data['tgl']))) ?></td>
+                                </tr>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>

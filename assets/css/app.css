@@ -2562,9 +2562,9 @@ input.search-control-2::placeholder {
 
 .filter-container {
 	padding: 10px;
-	background-color: #f8f9fa; 
-	border: 1px solid #ddd; 
-	border-radius: 8px; 
+	/* background-color: #f8f9fa;  */
+	/* border: 1px solid #ddd;  */
+	/* border-radius: 8px;  */
 }
 
 .filter-container .form-group {
