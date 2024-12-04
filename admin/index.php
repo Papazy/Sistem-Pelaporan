@@ -480,7 +480,12 @@ date_default_timezone_set('Asia/Jakarta');
 			$(document).ready(function() {
 				var table = $('#example2').DataTable({
 					lengthChange: false,
-					buttons: ['copy', 'excel', 'pdf', 'print']
+					buttons: [ 'copy', 'excel', 'pdf', {
+              extend: 'print',
+              exportOptions: {
+                stripHtml: false,
+							}
+            }]
 				});
 
 				table.buttons().container()

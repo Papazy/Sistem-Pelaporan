@@ -446,9 +446,7 @@ function getParameterByName(name) {
                                 <th width="5%">
                                     <center>No</center>
                                 </th>
-                                <th width="20%">
-                                    <center>pdf</center>
-                                </th>
+                               
                                 <th width="50%">
                                     <center>Foto</center>
                                 </th>
@@ -480,13 +478,7 @@ function getParameterByName(name) {
                             ?>
                                 <tr>
                                     <td><?= $no++ ?></td>
-                                    <td>
-                                        <?php if (!empty($pdfData[$id_laporan])) {
-                                            foreach ($pdfData[$id_laporan] as $pdf) { ?>
-                                                <a href="../file/<?= $pdf ?>" download>Unduh PDF</a><br>
-                                        <?php }
-                                        } ?>
-                                    </td>
+                                    
                                     <td>
                                         <?php if (!empty($fotoData[$id_laporan])) {
                                             foreach ($fotoData[$id_laporan] as $foto) { ?>

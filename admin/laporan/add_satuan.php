@@ -1,5 +1,6 @@
 <!--breadcrumb-->
 <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+
     <div class="breadcrumb-title pe-3">Laporan</div>
     <div class="ps-3">
         <nav aria-label="breadcrumb">
@@ -11,6 +12,8 @@
         </nav>
     </div>
 </div>
+
+
 <!--end breadcrumb-->
 <?php
 if (isset($_POST['submit'])) {
@@ -69,7 +72,9 @@ if (isset($_POST['submit'])) {
         </form>
     </div>
 </div>
+
 <h6 class="mb-0 text-uppercase">Satuan</h6>
+
 <hr />
 <div class="card">
     <div class="card-body">
@@ -87,8 +92,12 @@ if (isset($_POST['submit'])) {
                             <center>Di Buat </center>
                         </th>
                         <th width="10%">Tanggal Buat</th>
+                        <th width="20%">
+                            <center>Di Edit </center>
+                        </th>
+                        <th width="10%">Tanggal Edit</th>
                         <th width="5%">
-                            <center>Action<center>
+                            <center>Action</center>
                         </th>
                     </tr>
                 </thead>
@@ -102,15 +111,57 @@ if (isset($_POST['submit'])) {
                             <td>
                                 <center><?= $no++ ?></center>
                             </td>
-                            <td><center><i><?= $data['judul_satuan'] ?></i></center></td>
+                            <td>
+                                <center><i><?= $data['judul_satuan'] ?></i></center>
+                            </td>
                             <td><?= ucwords($data['created_by']) ?></td>
                             <td>
-                                <center><?= $data['created_at']?></center>
+                                <center><?= $data['created_at'] ?></center>
                             </td>
+                            <td><?= ucwords($data['edited_by']) ?></td>
                             <td>
-                               <a href="index.php?page=delete_satuan&id=<?= $data['satuan'] ?>" style="color:red" onClick="return confirm('Delete This ?')"><i class="bx bxs-trash"></i> Hapus</a>
+                                <center><?= $data['edited_at'] ?></center>
+                            </td>
+                            <td class="text-center">
+                                <!-- Tombol Edit dengan ikon -->
+                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $data['satuan'] ?>">
+                                    <i class="bx bxs-edit"></i> Edit
+                                </button>
+                                <!-- Tombol Hapus dengan ikon -->
+                                <a href="index.php?page=delete_satuan&id=<?= $data['satuan'] ?>" class="btn btn-danger btn-sm" onClick="return confirm('Delete This?')">
+                                    <i class="bx bxs-trash"></i> Hapus
+                                </a>
                             </td>
                         </tr>
+
+                        <!-- Modal Edit -->
+                        <div class="modal fade" id="editModal<?= $data['satuan'] ?>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Edit Satuan</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- Form Edit -->
+                                        <form action="laporan/update_satuan.php" method="POST">
+                                            <div class="form-group">
+                                                <label for="judul_satuan">Judul Satuan</label>
+                                                <input type="text" class="form-control" name="judul_satuan" value="<?= $data['judul_satuan'] ?>" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="created_by">Edited By</label>
+                                                <input type="text" class="form-control" name="created_by" value="<?= $data['created_by'] ?>" disabled>
+                                            </div>
+                                            <input type="hidden" name="satuan_id" value="<?= $data['satuan'] ?>">
+                                            <input type="hidden" name="editor" value="<?= ucwords($_SESSION['nama']); ?>">
+                                            <button type="submit" class="btn btn-primary">Update</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     <?php
                     };
                     ?>
@@ -118,4 +169,6 @@ if (isset($_POST['submit'])) {
             </table>
         </div>
     </div>
+
+
 </div>
