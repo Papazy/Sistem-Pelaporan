@@ -40,12 +40,18 @@
         </div>
         ';
         }else{
+        $query_sebelum = "SELECT * FROM staff WHERE id_staff='$id'";
+        $result_sebelum = mysqli_query($conn, $query_sebelum);
+        $staff_sebelum = mysqli_fetch_assoc($result_sebelum);
+        $staff_name = $staff_sebelum['nama'];
+        $staff_nrp = $staff_sebelum['nrp'];
+
         mysqli_query($conn, "UPDATE staff SET nrp='$nrp',nama='$nama',jenis_kelamin='$jk',pangkat='$pangkat',
         password='$pass',tipe='$tipe' WHERE id_staff = '$id'");
 
         // Simpan Aktivitas Admin
         $current_user = $_SESSION['nama'];
-        $aktivitas = "Mengubah staff: $nama dengan NRP: $nrp";
+        $aktivitas = "ubah anggota: `$staff_name` dengan NRP: `$staff_nrp` menjadi `$nama` dengan NRP: `$nrp`";
         $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
         mysqli_query($conn, $insert_aktivitas);
 

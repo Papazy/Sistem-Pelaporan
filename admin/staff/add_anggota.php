@@ -38,12 +38,12 @@
         </div>
         ';
         }else{
-        mysqli_query($conn, "INSERT INTO staff(id_staff,nrp,nama,jenis_kelamin,pangkat,password,tipe)
-        VALUES ('','$nrp','$nama','$jk','$pangkat','$pass','$tipe')");
+        mysqli_query($conn, "INSERT INTO staff(nrp,nama,jenis_kelamin,pangkat,password,tipe)
+        VALUES ('$nrp','$nama','$jk','$pangkat','$pass','$tipe')");
 
         // Simpan Aktivitas Admin
         $current_user = $_SESSION['nama'];
-        $aktivitas = "Menambahkan staff: $nama dengan NRP: $nrp";
+        $aktivitas = "tambah anggota: `$nama` dengan NRP: `$nrp`";
         $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
         mysqli_query($conn, $insert_aktivitas);
 

@@ -34,11 +34,13 @@ if (isset($_POST['submit'])) {
         </div>
         ';
     } else {
-        mysqli_query($conn, "INSERT INTO jenis_kegiatan(kegiatan,judul_kegiatan,created_by,created_at)
-        VALUES ('','$judul','$created_by','$created_at')");
+        mysqli_query($conn, "INSERT INTO jenis_kegiatan(judul_kegiatan,created_by,created_at)
+        VALUES ('$judul','$created_by','$created_at')");
+        
         // Simpan Aktivitas Admin
-        $aktivitas = "Menambahkan jenis kegiatan: $judul";
-        $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$created_by', '$aktivitas')";
+        $current_user = $_SESSION['nama'];
+        $aktivitas = "tambah jenis kegiatan: `$judul`";
+        $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
         mysqli_query($conn, $insert_aktivitas);
         echo '
         <div class="alert alert-success border-0 bg-success alert-dismissible fade show py-2">

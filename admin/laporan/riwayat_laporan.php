@@ -77,7 +77,6 @@
                     $id_staff = $_SESSION['id_staff'];
                     $query = mysqli_query($conn, "SELECT * FROM laporan_kegiatan as a JOIN satuan as b ON b.satuan = a.satuan JOIN jenis_kegiatan as c ON c.kegiatan = a.kegiatan  WHERE a.created_by = '$id_staff'");
 
-                    
                     while ($data = mysqli_fetch_array($query)) { ?>
                         <tr>
                             <td>

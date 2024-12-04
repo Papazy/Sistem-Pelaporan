@@ -49,7 +49,7 @@
                                 if ($data['tipe']=="admin") {
                                     // Simpan Aktivitas Admin
                                     $current_user = $_SESSION['nama'];
-                                    $aktivitas = "Login";
+                                    $aktivitas = "login";
                                     $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
                                     mysqli_query($conn, $insert_aktivitas);
 
