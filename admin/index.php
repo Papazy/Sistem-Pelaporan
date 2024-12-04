@@ -469,18 +469,6 @@ date_default_timezone_set('Asia/Jakarta');
 						case 'delete_satuan':
 							include "laporan/delete_satuan.php";
 							break;
-							case 'add_satuan':
-							include "laporan/add_satuan.php";
-							break;
-						case 'delete_satuan':
-							include "laporan/delete_satuan.php";
-							break;
-						case 'add_satuan':
-							include "laporan/add_satuan.php";
-							break;
-						case 'delete_satuan':
-							include "laporan/delete_satuan.php";
-							break;
 						case 'add_jenis_kegiatan':
 							include "laporan/add_jenis_kegiatan.php";
 							break;
