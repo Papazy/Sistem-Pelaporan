@@ -27,7 +27,7 @@ if (isset($_POST['submit'])) {
     VALUES ('','$judul','$satuan','$kegiatan','$lokasi','$tgl','$mytextarea','$created_by','$created_at','PENDING')");
     $get_id = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM laporan_kegiatan ORDER BY id_laporan DESC LIMIT 1"));
     $id = $get_id['id_laporan'];
-    echo "<script>window.location.href='index.php?page=upload_laporan&&id=".$id."';</script>'";
+    echo "<script>window.location.href='index.php?page=upload_laporan&&id=".$id."&status=success&status_type=1';</script>'";
 }
 ?>
 <div class="row">

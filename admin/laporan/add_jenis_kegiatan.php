@@ -74,48 +74,92 @@ if (isset($_POST['submit'])) {
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
-            <table id="example" class="table table-striped table-bordered" style="width:100%">
-                <thead>
-                    <tr>
-                        <th width="5%">
-                            <center>No</center>
-                        </th>
-                        <th>
-                            <center>Kegiatan</center>
-                        </th>
-                        <th width="20%">
-                            <center>Di Buat </center>
-                        </th>
-                        <th width="10%">Tanggal Buat</th>
-                        <th width="5%">
-                            <center>Action<center>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    include "../conn/conn.php";
-                    $no = 1;
-                    $query = mysqli_query($conn, "SELECT * FROM jenis_kegiatan");
-                    while ($data = mysqli_fetch_array($query)) { ?>
-                        <tr>
-                            <td>
-                                <center><?= $no++ ?></center>
-                            </td>
-                            <td><center><i><?= $data['judul_kegiatan'] ?></i></center></td>
-                            <td><?= ucwords($data['created_by']) ?></td>
-                            <td>
-                                <center><?= $data['created_at']?></center>
-                            </td>
-                            <td>
-                               <a href="index.php?page=delete_jenis_kegiatan&id=<?= $data['kegiatan'] ?>" style="color:red" onClick="return confirm('Delete This ?')"><i class="bx bxs-trash"></i> Hapus</a>
-                            </td>
-                        </tr>
-                    <?php
-                    };
-                    ?>
-                </tbody>
-            </table>
+        <table id="example" class="table table-striped table-bordered" style="width:100%">
+    <thead>
+        <tr>
+            <th width="5%">
+                <center>No</center>
+            </th>
+            <th>
+                <center>Kegiatan</center>
+            </th>
+            <th width="20%">
+                <center>Di Buat </center>
+            </th>
+            <th width="10%">Tanggal Buat</th>
+            <th width="20%">
+                <center>Di Edit </center>
+            </th>
+            <th width="10%">Tanggal Edit</th>
+            <th width="5%">
+                <center>Action</center>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        include "../conn/conn.php";
+        $no = 1;
+        $query = mysqli_query($conn, "SELECT * FROM jenis_kegiatan");
+        while ($data = mysqli_fetch_array($query)) { ?>
+            <tr>
+                <td>
+                    <center><?= $no++ ?></center>
+                </td>
+                <td><center><i><?= $data['judul_kegiatan'] ?></i></center></td>
+                <td><?= ucwords($data['created_by']) ?></td>
+                <td>
+                    <center><?= $data['created_at']?></center>
+                </td>
+                <td><?= ucwords($data['edited_by']) ?></td>
+                <td>
+                    <center><?= $data['edited_at']?></center>
+                </td>
+                <td class="text-center">
+                    <!-- Tombol Edit dengan ikon -->
+                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $data['kegiatan'] ?>">
+                        <i class="bx bxs-edit"></i> Edit
+                    </button>
+                    <!-- Tombol Hapus dengan ikon -->
+                    <a href="index.php?page=delete_jenis_kegiatan&id=<?= $data['kegiatan'] ?>" class="btn btn-danger btn-sm" onClick="return confirm('Delete This?')">
+                        <i class="bx bxs-trash"></i> Hapus
+                    </a>
+                </td>
+            </tr>
+
+            <!-- Modal Edit -->
+            <div class="modal fade" id="editModal<?= $data['kegiatan'] ?>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Edit Kegiatan</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Form Edit -->
+                            <form action="laporan/update_jenis_kegiatan.php" method="POST">
+                                <div class="form-group">
+                                    <label for="judul_kegiatan">Judul Kegiatan</label>
+                                    <input type="text" class="form-control" name="judul_kegiatan" value="<?= $data['judul_kegiatan'] ?>" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="created_by">Created By</label>
+                                    <input type="text" class="form-control" name="created_by" value="<?= $data['created_by'] ?>" disabled>
+                                </div>
+                                <input type="hidden" name="kegiatan_id" value="<?= $data['kegiatan'] ?>">
+                                <input type="hidden" name="editor" value="<?= ucwords($_SESSION['nama']); ?>">
+                                <button type="submit" class="btn btn-primary mt-2">Update</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php
+        };
+        ?>
+    </tbody>
+</table>
         </div>
     </div>
 </div>

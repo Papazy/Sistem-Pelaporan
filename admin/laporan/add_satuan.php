@@ -75,6 +75,7 @@ if (isset($_POST['submit'])) {
 
 <h6 class="mb-0 text-uppercase">Satuan</h6>
 
+
 <hr />
 <div class="card">
     <div class="card-body">
@@ -136,7 +137,7 @@ if (isset($_POST['submit'])) {
 
                         <!-- Modal Edit -->
                         <div class="modal fade" id="editModal<?= $data['satuan'] ?>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
+                            <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="exampleModalLabel">Edit Satuan</h5>
@@ -156,7 +157,7 @@ if (isset($_POST['submit'])) {
                                             </div>
                                             <input type="hidden" name="satuan_id" value="<?= $data['satuan'] ?>">
                                             <input type="hidden" name="editor" value="<?= ucwords($_SESSION['nama']); ?>">
-                                            <button type="submit" class="btn btn-primary">Update</button>
+                                            <button type="submit" class="btn btn-primary mt-2">Update</button>
                                         </form>
                                     </div>
                                 </div>
@@ -169,6 +170,4 @@ if (isset($_POST['submit'])) {
             </table>
         </div>
     </div>
-
-
 </div>

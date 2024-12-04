@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Menjalankan query dan memeriksa apakah berhasil
     if (mysqli_query($conn, $query)) {
         // Redirect ke halaman yang sama atau halaman lain setelah update berhasil
-        header("Location: ../index.php?page=add_satuan&status=success");
+        header("Location: ../index.php?page=add_satuan&status=success&status_type=2");
         exit();
     } else {
         // Jika gagal, tampilkan error

@@ -25,7 +25,7 @@ if (isset($_POST['submit'])) {
     $mytextarea = $_POST['mytextarea'];
     $created_at = date('Y-m-d');
     mysqli_query($conn,"UPDATE laporan_kegiatan SET judul_laporan='$judul',satuan='$satuan',kegiatan='$kegiatan',lokasi='$lokasi',tgl='$tgl',isi='$mytextarea',created_at='$created_at',status='PENDING' WHERE id_laporan='$id_laporan'");
-    echo "<script>window.location.href='index.php?page=riwayat_laporan';</script>'";
+    echo "<script>window.location.href='index.php?page=riwayat_laporan&status=success&status_type=2';</script>'";
 }
 ?>
 <div class="row">

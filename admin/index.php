@@ -334,7 +334,72 @@ date_default_timezone_set('Asia/Jakarta');
 			</div>
 		</header>
 		<!--end header -->
+<!-- Modal Success -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">Success</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex align-items-center py-2">
+          <span id="modalMessage"></span>
+          <div class="icon ms-2">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="green" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+</svg>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  window.onload = function() {
+    // Ambil parameter status dan status_type dari URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    const statusType = urlParams.get('status_type');
 
+    // Tentukan pesan dan ikon berdasarkan status_type
+    let message = '';
+    let iconClass = '';
+
+    if (status === 'success') {
+      switch (statusType) {
+        case '1':
+          message = 'Data berhasil dibuat!';
+          iconClass = 'bx-check-circle';  // Ikon untuk berhasil dibuat
+          break;
+        case '2':
+          message = 'Data berhasil diperbarui!';
+          iconClass = 'bx-edit';  // Ikon untuk berhasil diperbarui
+          break;
+        case '3':
+          message = 'Data berhasil dihapus!';
+          iconClass = 'bx-trash';  // Ikon untuk berhasil dihapus
+          break;
+        default:
+          message = 'Operasi berhasil!';
+          iconClass = 'bx-check';  // Ikon default
+      }
+
+      // Set pesan dan ikon pada modal
+      document.getElementById('modalMessage').innerText = message;
+      
+
+      // Tampilkan modal success
+      var myModal = new bootstrap.Modal(document.getElementById('successModal'), {
+        keyboard: false  // Menonaktifkan penutupan modal dengan keyboard
+      });
+      myModal.show();  // Menampilkan modal success
+    }
+  };
+</script>
 		<!--start page wrapper -->
 		<div class="page-wrapper">
 			<div class="page-content">
