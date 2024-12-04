@@ -42,6 +42,13 @@
         }else{
         mysqli_query($conn, "UPDATE staff SET nrp='$nrp',nama='$nama',jenis_kelamin='$jk',pangkat='$pangkat',
         password='$pass',tipe='$tipe' WHERE id_staff = '$id'");
+
+        // Simpan Aktivitas Admin
+        $current_user = $_SESSION['nama'];
+        $aktivitas = "Mengubah staff: $nama dengan NRP: $nrp";
+        $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
+        mysqli_query($conn, $insert_aktivitas);
+
         echo "<script>window.location.href='index.php?page=list_anggota';</script>'";
         }
     }

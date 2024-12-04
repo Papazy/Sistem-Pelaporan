@@ -47,6 +47,12 @@
                                 $_SESSION['nama'] = $data['nama'];
                                 $_SESSION['id_staff'] = $data['id_staff'];
                                 if ($data['tipe']=="admin") {
+                                    // Simpan Aktivitas Admin
+                                    $current_user = $_SESSION['nama'];
+                                    $aktivitas = "Login";
+                                    $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
+                                    mysqli_query($conn, $insert_aktivitas);
+
                                     header("location:admin/index.php");
                                     exit();
                                 }elseif($data['tipe']=="anggota"){

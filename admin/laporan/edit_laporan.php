@@ -25,6 +25,13 @@ if (isset($_POST['submit'])) {
     $mytextarea = $_POST['mytextarea'];
     $created_at = date('Y-m-d');
     mysqli_query($conn,"UPDATE laporan_kegiatan SET judul_laporan='$judul',satuan='$satuan',kegiatan='$kegiatan',lokasi='$lokasi',tgl='$tgl',isi='$mytextarea',created_at='$created_at',status='PENDING' WHERE id_laporan='$id_laporan'");
+
+    // Simpan Aktivitas Admin
+    $current_user = $_SESSION['nama'];
+    $aktivitas = "Mengubah laporan kegiatan ID: $id_laporan";
+    $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
+    mysqli_query($conn, $insert_aktivitas);
+
     echo "<script>window.location.href='index.php?page=riwayat_laporan&status=success&status_type=2';</script>'";
 }
 ?>
