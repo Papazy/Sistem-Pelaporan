@@ -2559,6 +2559,34 @@ input.search-control-2::placeholder {
 	}
 }
 
+
+.filter-container {
+	padding: 10px;
+	background-color: #f8f9fa; 
+	border: 1px solid #ddd; 
+	border-radius: 8px; 
+}
+
+.filter-container .form-group {
+	display: flex;
+	flex-direction: column;
+}
+
+.filter-container .form-label {
+	font-weight: 600;
+	margin-bottom: 5px;
+	font-size: 0.9rem; /* Sedikit kecil */
+}
+
+.filter-container .form-control {
+	min-width: 150px;
+	font-size: 0.9rem; /* Konsisten dengan label */
+}
+
+.filter-container .gap-3 {
+	gap: 15px; /* Jarak antar elemen */
+}
+
 @media screen and (max-width:991px) {
 	.section-authentication-signin {
 		height: 100%;

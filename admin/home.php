@@ -1,7 +1,8 @@
 <?php
 include "../conn/conn.php";
-function tgl_indo($tanggal){
-    $bulan = array (
+function tgl_indo($tanggal)
+{
+    $bulan = array(
         1 =>   'Januari',
         'Februari',
         'Maret',
@@ -16,12 +17,12 @@ function tgl_indo($tanggal){
         'Desember'
     );
     $pecahkan = explode('-', $tanggal);
-    
+
     // variabel pecahkan 0 = tanggal
     // variabel pecahkan 1 = bulan
     // variabel pecahkan 2 = tahun
- 
-    return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
+
+    return $pecahkan[2] . ' ' . $bulan[(int)$pecahkan[1]] . ' ' . $pecahkan[0];
 }
 ?>
 <div class="row">
@@ -30,7 +31,24 @@ function tgl_indo($tanggal){
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col-lg-3 col-xl-2">
-                        <a class="btn btn-primary mb-3 mb-lg-0"><i class='bx bxs-home-circle'></i>Dashboard</a>
+                        <!-- <a class="btn btn-primary mb-3 mb-lg-0"><i class='bx bxs-home-circle'></i>Dashboard</a> -->
+                        <div class="filter-container d-flex align-items-center gap-3">
+                            <div class="form-group mb-0" style="width: 120px;">
+                                <label for="filterType" class="form-label">Pilih Filter:</label>
+                                <select id="filterType" class="form-control" onchange="updateFilterOptions()" style="width: 120px;">
+                                    <option value="-">-</option>
+                                    <option value="harian">Harian</option>
+                                    <option value="bulanan">Bulanan</option>
+                                    <option value="tahunan">Tahunan</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-0" style="width: 120px;">
+                                <label id="filterOptionsLabel" for="filterOptions" class="form-label">Opsi:</label>
+                                <select id="filterOptions" class="form-control" style="width: 120px;">
+                                    <option value="none">-</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-lg-9 col-xl-10">
                         <form class="float-lg-end">
@@ -91,6 +109,67 @@ function tgl_indo($tanggal){
             iconElement.style.color = '#2c3e50'; // Warna biru gelap
         }
     }
+
+    function updateFilterOptions() {
+        const filterType = document.getElementById("filterType").value;
+        const filterOptions = document.getElementById("filterOptions");
+        const filterOptionsLabel = document.getElementById("filterOptionsLabel");
+        filterOptions.innerHTML = ""; // Clear previous options
+
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth();
+        const currentDate = today.getDate();
+
+        if (filterType === "harian") {
+            filterOptionsLabel.textContent = "Tanggal:";
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const option = document.createElement("option");
+                option.value = i;
+                option.textContent = `${i}`;
+                if (i === currentDate) option.selected = true; // Set default to today's date
+                filterOptions.appendChild(option);
+            }
+        } else if (filterType === "bulanan") {
+            filterOptionsLabel.textContent = "Bulan:";
+            const months = [
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+            ];
+            months.forEach((month, index) => {
+                const option = document.createElement("option");
+                option.value = index + 1;
+                option.textContent = month;
+                if (index === currentMonth) option.selected = true; // Set default to this month
+                filterOptions.appendChild(option);
+            });
+        } else if (filterType === "tahunan") {
+            filterOptionsLabel.textContent = "Tahun:";
+            for (let i = 2015; i <= currentYear; i++) {
+                const option = document.createElement("option");
+                option.value = i;
+                option.textContent = `${i}`;
+                if (i === currentYear) option.selected = true; // Set default to this year
+                filterOptions.appendChild(option);
+            }
+        } else {
+            filterOptionsLabel.textContent = "Opsi:"; // Default label
+            const option = document.createElement("option");
+            option.value = "none";
+            option.textContent = "None";
+            option.selected = true; // Set default to None
+            filterOptions.appendChild(option);
+        }
+    }
+
+    // Set default filter on page load
+    window.onload = function() {
+        const filterType = document.getElementById("filterType");
+        filterType.value = "harian"; // Default to Harian
+        updateFilterOptions();
+    };
+
 
     // Update setiap detik
     setInterval(updateJam, 1000);
@@ -198,99 +277,110 @@ function tgl_indo($tanggal){
 </div>
 
 <div class="row">
-<div class="col-md-12">
-<div class="card">
-    <h1><center>Laporan Cepat</h1></center>
-	</script>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table id="example2" class="table table-striped table-bordered" style="width:100%">
-                <thead>
-                    <tr>
-                        <th width="5%">
-                            <center>No</center>
-                        </th>
-                        <th width="20%">
-                            <center>pdf</center>
-                        </th>
-                        <th width="50%">
-                            <center>Foto</center>
-                        </th>
-                        <th>
-                            <center>Judul Laporan</center>
-                        </th>
-                        <th width="20%">
-                            <center>Satuan</center>
-                        </th>
-                        <th width="20%">
-                            <center>Kegiatan</center>
-                        </th>
-                        <th width="20%">
-                            <center>Lokasi</center>
-                        </th>
-                        <th width="20%">
-                            <center>Peserta</center>
-                        </th>
-                        <th>
-                            <center>Tanggal Laporan<center>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    include "../conn/conn.php";
-                    $no = 1;
-                    $id_staff = $_SESSION['id_staff'];
-                    $query = mysqli_query($conn, "SELECT * FROM laporan_kegiatan as a JOIN satuan as b ON b.satuan = a.satuan JOIN jenis_kegiatan as c ON c.kegiatan = a.kegiatan  WHERE a.status='DITERIMA' ORDER BY a.id_laporan DESC");
-                    while ($data = mysqli_fetch_array($query)) { ?>
-                        <tr>
-                            <td>
-                                <center><?= $no++ ?></center>
-                            </td>
-                            <td>
-                                <table class="pdf">
-                                <?php
-                                $id_laporan = $data['id_laporan'];
-                                $query_pdf = mysqli_query($conn, "SELECT * FROM pdf_kegiatan WHERE id_laporan = '$id_laporan'");
-                                while ($pdf = mysqli_fetch_array($query_pdf)) {
-                                    echo '<a href="../file/'.$pdf['pdf'].'" download>Unduh PDF</a>';
-                                ?>
-                                <?php } ?>
-                                </table>
-                            </td>
-                            <td>
-                                <table class="table-foto">
-                                <?php
-                                $id_laporan = $data['id_laporan'];
-                                $query_foto = mysqli_query($conn, "SELECT * FROM foto_kegiatan WHERE id_laporan = '$id_laporan'");
-                                while ($foto = mysqli_fetch_array($query_foto)) {
-                                ?>
-                                    <tr>
+    <div class="col-md-12">
+        <div class="card">
+            <h1>
+                <center>Laporan Cepat
+            </h1>
+            </center>
+            </script>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="example2" class="table table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th width="5%">
+                                    <center>No</center>
+                                </th>
+                                <th width="20%">
+                                    <center>pdf</center>
+                                </th>
+                                <th width="50%">
+                                    <center>Foto</center>
+                                </th>
+                                <th>
+                                    <center>Judul Laporan</center>
+                                </th>
+                                <th width="20%">
+                                    <center>Satuan</center>
+                                </th>
+                                <th width="20%">
+                                    <center>Kegiatan</center>
+                                </th>
+                                <th width="20%">
+                                    <center>Lokasi</center>
+                                </th>
+                                <th width="20%">
+                                    <center>Peserta</center>
+                                </th>
+                                <th>
+                                    <center>Tanggal Laporan<center>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            include "../conn/conn.php";
+                            $no = 1;
+                            $id_staff = $_SESSION['id_staff'];
+                            $query = mysqli_query($conn, "SELECT * FROM laporan_kegiatan as a JOIN satuan as b ON b.satuan = a.satuan JOIN jenis_kegiatan as c ON c.kegiatan = a.kegiatan  WHERE a.status='DITERIMA' ORDER BY a.id_laporan DESC");
+                            while ($data = mysqli_fetch_array($query)) { ?>
+                                <tr>
                                     <td>
-                                        <img src="../file/<?= $foto['foto'] ?>" width="150" height="120" class="border rounded cursor-pointer mr-5" alt="">
+                                        <center><?= $no++ ?></center>
                                     </td>
-                                    </tr>
-                                <?php } ?>
-                                </table>
-                            </td>
-                            <td><center><b><?= ucwords($data['judul_laporan']) ?></b></center></td>
-                            <td><center><?= ucfirst($data['judul_satuan']) ?></center></td>
-                            <td><center><?= ucfirst($data['judul_kegiatan']) ?></center></td>
-                            <td>
-                                <?= ucwords($data['lokasi']) ?>
-                            </td>
-                            <td><center><?= ucfirst($data['isi']) ?></center></td>
-                            <td>
-                                <center><?= tgl_indo(date('Y-m-d', strtotime($data['tgl']))) ?></center>
-                            </td>                           
-                        </tr>
-                    <?php
-                    };
-                    ?>
-                </tbody>
-            </table>
+                                    <td>
+                                        <table class="pdf">
+                                            <?php
+                                            $id_laporan = $data['id_laporan'];
+                                            $query_pdf = mysqli_query($conn, "SELECT * FROM pdf_kegiatan WHERE id_laporan = '$id_laporan'");
+                                            while ($pdf = mysqli_fetch_array($query_pdf)) {
+                                                echo '<a href="../file/' . $pdf['pdf'] . '" download>Unduh PDF</a>';
+                                            ?>
+                                            <?php } ?>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table class="table-foto">
+                                            <?php
+                                            $id_laporan = $data['id_laporan'];
+                                            $query_foto = mysqli_query($conn, "SELECT * FROM foto_kegiatan WHERE id_laporan = '$id_laporan'");
+                                            while ($foto = mysqli_fetch_array($query_foto)) {
+                                            ?>
+                                                <tr>
+                                                    <td>
+                                                        <img src="../file/<?= $foto['foto'] ?>" width="150" height="120" class="border rounded cursor-pointer mr-5" alt="">
+                                                    </td>
+                                                </tr>
+                                            <?php } ?>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <center><b><?= ucwords($data['judul_laporan']) ?></b></center>
+                                    </td>
+                                    <td>
+                                        <center><?= ucfirst($data['judul_satuan']) ?></center>
+                                    </td>
+                                    <td>
+                                        <center><?= ucfirst($data['judul_kegiatan']) ?></center>
+                                    </td>
+                                    <td>
+                                        <?= ucwords($data['lokasi']) ?>
+                                    </td>
+                                    <td>
+                                        <center><?= ucfirst($data['isi']) ?></center>
+                                    </td>
+                                    <td>
+                                        <center><?= tgl_indo(date('Y-m-d', strtotime($data['tgl']))) ?></center>
+                                    </td>
+                                </tr>
+                            <?php
+                            };
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-</div>
 </div>
