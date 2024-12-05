@@ -348,17 +348,15 @@ date_default_timezone_set('Asia/Jakarta');
 <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="successModalLabel">Success</h5>
+      <div class="modal-header" id="modalHeader">
+        <h5 class="modal-title" id="successModalLabel" style="color:white">Success</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="d-flex align-items-center py-2">
           <span id="modalMessage"></span>
-          <div class="icon ms-2">
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="green" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
-  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-</svg>
+          <div class="icon ms-2" id="modalIcon">
+            <!-- SVG icon will be inserted here dynamically -->
           </div>
         </div>
       </div>
@@ -370,45 +368,74 @@ date_default_timezone_set('Asia/Jakarta');
 </div>
 <script>
   window.onload = function() {
-    // Ambil parameter status dan status_type dari URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const status = urlParams.get('status');
-    const statusType = urlParams.get('status_type');
+  // Ambil parameter status dan status_type dari URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const status = urlParams.get('status');
+  const statusType = urlParams.get('status_type');
 
-    // Tentukan pesan dan ikon berdasarkan status_type
+  // Tentukan elemen header, pesan, dan ikon
+  const modalHeader = document.getElementById('modalHeader');
+  const modalIcon = document.getElementById('modalIcon');
+  const modalMessage = document.getElementById('modalMessage');
+
+  if (status === 'success') {
     let message = '';
-    let iconClass = '';
+    let headerColor = '';
+    let iconColor = '';
 
-    if (status === 'success') {
-      switch (statusType) {
-        case '1':
-          message = 'Data berhasil dibuat!';
-          iconClass = 'bx-check-circle';  // Ikon untuk berhasil dibuat
-          break;
-        case '2':
-          message = 'Data berhasil diperbarui!';
-          iconClass = 'bx-edit';  // Ikon untuk berhasil diperbarui
-          break;
-        case '3':
-          message = 'Data berhasil dihapus!';
-          iconClass = 'bx-trash';  // Ikon untuk berhasil dihapus
-          break;
-        default:
-          message = 'Operasi berhasil!';
-          iconClass = 'bx-check';  // Ikon default
-      }
-
-      // Set pesan dan ikon pada modal
-      document.getElementById('modalMessage').innerText = message;
-      
-
-      // Tampilkan modal success
-      var myModal = new bootstrap.Modal(document.getElementById('successModal'), {
-        keyboard: false  // Menonaktifkan penutupan modal dengan keyboard
-      });
-      myModal.show();  // Menampilkan modal success
+    // Tentukan pesan, warna header, dan warna ikon berdasarkan status_type
+    switch (statusType) {
+      case '1': // Create
+        message = 'Data berhasil dibuat!';
+        headerColor = 'bg-success'; // Hijau
+        iconColor = 'green';
+        break;
+      case '2': // Update
+        message = 'Data berhasil diperbarui!';
+        headerColor = 'bg-warning'; // Kuning
+        iconColor = 'orange';
+        break;
+      case '3': // Delete
+        message = 'Data berhasil dihapus!';
+        headerColor = 'bg-danger'; // merah
+        iconColor = 'red';
+        break;
+				case '4': // Terima
+					message = 'Laporan Diterima!';
+					headerColor = 'bg-success'; // Hijau
+					iconColor = 'red';
+					break;
+				case '5': // Tolak
+					message = 'Laporan Ditolak!';
+					headerColor = 'bg-danger'; // merah
+					iconColor = 'red';
+					break;
+      default:
+        message = 'Operasi berhasil!';
+        headerColor = 'bg-primary'; // Default biru
+        iconColor = 'blue';
     }
-  };
+
+    // Set warna header
+    modalHeader.className = `modal-header ${headerColor}`;
+
+    // Set pesan modal
+    modalMessage.innerText = message;
+
+    // Set ikon SVG
+    modalIcon.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="${iconColor}" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+      </svg>
+    `;
+
+    // Tampilkan modal success
+    const myModal = new bootstrap.Modal(document.getElementById('successModal'), {
+      keyboard: false
+    });
+    myModal.show();
+  }
+};
 </script>
 		<!--start page wrapper -->
 		<div class="page-wrapper">
@@ -575,6 +602,25 @@ date_default_timezone_set('Asia/Jakarta');
 			})
 		});
 	</script>
+	<script>
+  $(document).ready(function () {
+    var table = $('#example3').DataTable({
+      "createdRow": function (row, data, dataIndex) {
+        // Cek nilai pada kolom aktivitas (indeks ke-2, karena array dimulai dari 0)
+        const aktivitas = data[2].toLowerCase(); // Kolom aktivitas
+        if (aktivitas.includes("ubah")) {
+          $(row).css('background-color', 'rgba(255, 193, 7, 0.2)'); // Kuning muda
+        } else if (aktivitas.includes("tambah")) {
+          $(row).css('background-color', 'rgba(40, 167, 69, 0.2)'); // Hijau muda
+        } else if (aktivitas.includes("hapus")) {
+          $(row).css('background-color', 'rgba(220, 53, 69, 0.2)'); // Merah muda
+        } else if (aktivitas.includes("logout")) {
+          $(row).css('background-color', 'rgba(0, 123, 255, 0.2)'); // Biru muda
+        }
+      }
+    });
+  });
+</script>
 	<!--app JS-->
 	<script src="../assets/js/app.js"></script>
 </body>

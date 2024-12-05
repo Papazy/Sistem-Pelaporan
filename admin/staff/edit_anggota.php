@@ -55,7 +55,7 @@
         $insert_aktivitas = "INSERT INTO aktivitas_admin (nama_admin, aktivitas) VALUES ('$current_user', '$aktivitas')";
         mysqli_query($conn, $insert_aktivitas);
 
-        echo "<script>window.location.href='index.php?page=list_anggota';</script>'";
+        echo "<script>window.location.href='index.php?page=list_anggota?status=success&status_type=2';</script>'";
         }
     }
     ?>

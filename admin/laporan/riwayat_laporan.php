@@ -14,6 +14,25 @@
 <!--end breadcrumb-->
 <h6 class="mb-0 text-uppercase">Laporan Saya</h6>
 <hr />
+
+<!-- Modal Konfirmasi Delete -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus laporan ini?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <a href="#" id="confirmDelete" class="btn btn-danger">Hapus</a>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
@@ -48,8 +67,9 @@
                 </thead>
                 <tbody>
                     <?php
-                    function tgl_indo($tanggal){
-                        $bulan = array (
+                    function tgl_indo($tanggal)
+                    {
+                        $bulan = array(
                             1 =>   'Januari',
                             'Februari',
                             'Maret',
@@ -64,12 +84,12 @@
                             'Desember'
                         );
                         $pecahkan = explode('-', $tanggal);
-                        
+
                         // variabel pecahkan 0 = tanggal
                         // variabel pecahkan 1 = bulan
                         // variabel pecahkan 2 = tahun
-                     
-                        return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
+
+                        return $pecahkan[2] . ' ' . $bulan[(int)$pecahkan[1]] . ' ' . $pecahkan[0];
                     }
 
                     include "../conn/conn.php";
@@ -82,9 +102,15 @@
                             <td>
                                 <center><?= $no++ ?></center>
                             </td>
-                            <td><center><b><?= ucwords($data['judul_laporan']) ?></b></center></td>
-                            <td><center><?= ucfirst($data['judul_satuan']) ?></center></td>
-                            <td><center><?= ucfirst($data['judul_kegiatan']) ?></center></td>
+                            <td>
+                                <center><b><?= ucwords($data['judul_laporan']) ?></b></center>
+                            </td>
+                            <td>
+                                <center><?= ucfirst($data['judul_satuan']) ?></center>
+                            </td>
+                            <td>
+                                <center><?= ucfirst($data['judul_kegiatan']) ?></center>
+                            </td>
                             <td>
                                 <?= ucwords($data['lokasi']) ?>
                             </td>
@@ -92,16 +118,15 @@
                                 <center><?= tgl_indo(date('Y-m-d', strtotime($data['tgl']))) ?></center>
                             </td>
                             <td>
-                                <center><span class="badge <?= $data['status']=="DITERIMA" ? ' bg-success' : ' bg-danger'?>"><?= $data['status'] ?></span></center>
+                                <center><span class="badge <?= $data['status'] == "DITERIMA" ? ' bg-success' : ' bg-danger' ?>"><?= $data['status'] ?></span></center>
                             </td>
                             <td>
-                            <?php
-                            if ($data['status']=="DITERIMA") {
-                             echo '----';
-                            }else { ?>
-                              <a href="index.php?page=edit_laporan&id=<?= $data['id_laporan'] ?>"><i class="bx bxs-pencil"></i> Edit</a> | <a href="index.php?page=delete_laporan&id=<?= $data['id_laporan'] ?>" style="color:red" onClick="return confirm('Delete This Laporan ?')"><i class="bx bxs-trash"></i> Hapus</a>
-                            <?php }
-                            ?>
+                                <?php if ($data['status'] == "DITERIMA") {
+                                    echo '----';
+                                } else { ?>
+                                    <a href="index.php?page=edit_laporan&id=<?= $data['id_laporan'] ?>"><i class="bx bxs-pencil"></i> Edit</a> |
+                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<?= $data['id_laporan'] ?>" onclick="setDeleteId(<?= $data['id_laporan'] ?>)"><i class="bx bxs-trash"></i> Hapus</a>
+                                <?php } ?>
                             </td>
                         </tr>
                     <?php
@@ -112,3 +137,12 @@
         </div>
     </div>
 </div>
+
+
+
+<script>
+    function setDeleteId(id) {
+        const deleteUrl = `index.php?page=delete_laporan&id=${id}`;
+        document.getElementById('confirmDelete').setAttribute('href', deleteUrl);
+    }
+</script>

@@ -57,7 +57,8 @@
                                 <center><?= strtoupper($data['pangkat']) ?></center>
                             </td>
                             <td>
-                            <a href="index.php?page=edit_anggota&id=<?= $data['id_staff'] ?>"><i class="bx bxs-pencil"></i> Edit</a> | <a href="index.php?page=delete_anggota&id=<?= $data['id_staff'] ?>" style="color:red" onClick="return confirm('Delete This Anggota?')"><i class="bx bxs-trash"></i> Hapus</a>
+                                <a href="index.php?page=edit_anggota&id=<?= $data['id_staff'] ?>"><i class="bx bxs-pencil"></i> Edit</a> |
+                                <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<?= $data['id_staff'] ?>" onclick="setDeleteId(<?= $data['id_staff'] ?>)"><i class="bx bxs-trash"></i> Hapus</a>
                             </td>
                         </tr>
                     <?php
@@ -68,3 +69,29 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Konfirmasi Delete -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus anggota ini?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <a href="#" id="confirmDelete" class="btn btn-danger">Hapus</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setDeleteId(id) {
+        const deleteUrl = `index.php?page=delete_anggota&id=${id}`;
+        document.getElementById('confirmDelete').setAttribute('href', deleteUrl);
+    }
+</script>

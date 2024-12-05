@@ -2587,6 +2587,7 @@ input.search-control-2::placeholder {
 	gap: 15px; /* Jarak antar elemen */
 }
 
+
 @media screen and (max-width:991px) {
 	.section-authentication-signin {
 		height: 100%;

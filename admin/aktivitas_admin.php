@@ -19,7 +19,7 @@
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
-            <table id="example" class="table table-striped table-bordered">
+        <table id="example" class="table table-striped table-bordered">
                 <thead>
                     <tr>
                         <th>No</th>
@@ -34,7 +34,17 @@
                     $result = mysqli_query($conn, $query);
                     $no = 1;
                     while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<tr>";
+                        // Tentukan kelas warna berdasarkan aktivitas
+                        $rowClass = '';
+                        if (stripos($row['aktivitas'], 'login') !== false) {
+                            $rowClass = 'background-color: rgba(0, 123, 255, 0.2) !important;'; 
+                        } elseif (stripos($row['aktivitas'], 'ubah') !== false) {
+                            $rowClass = 'background-color: rgba(255, 193, 7, 0.2) !important;'; 
+                        } elseif (stripos($row['aktivitas'], 'tambah') !== false) {
+                            $rowClass = 'background-color: rgba(40, 167, 69, 0.2) !important;'; 
+                        }
+                        
+                        echo "<tr style=''>";
                         echo "<td>" . $no++ . "</td>";
                         echo "<td>" . $row['nama_admin'] . "</td>";
                         echo "<td>" . $row['aktivitas'] . "</td>";
@@ -47,3 +57,14 @@
         </div>
     </div>
 </div>
+
+<!-- .activity-table-info {
+	background-color: rgba(0, 123, 255, 0.2); /* Biru muda */
+}
+.activity-table-warning {
+	background-color: rgba(255, 193, 7, 0.2); /* Kuning muda */
+}
+.activity-table-success {
+	background-color: rgba(40, 167, 69, 0.2); /* Hijau muda */
+}
+ -->
