@@ -99,7 +99,7 @@ $data = mysqli_fetch_assoc($result);
         <div class="card">
             <div class="card-body">
                 <div class="row align-items-center">
-                    <div class="col-lg-5 col-xl-2">
+                    <div class="col-lg-5 col-xl-5">
                         <div class="filter-container d-flex flex-wrap gap-3">
                             <div class="form-group mb-0">
                                 <label for="filterType" class="form-label">Pilih Filter:</label>
@@ -121,7 +121,7 @@ $data = mysqli_fetch_assoc($result);
                             <button class="btn btn-primary" onclick="filterTable()">Filter</button>
                         </div>
                     </div>
-                    <div class="col-lg-5 col-xl-8 ms-auto">
+                    <div class="col-lg-5 col-xl-5 ms-auto">
                         <form class="float-lg-end">
                             <div class="row row-cols-lg-auto g-2">
                                 <div class="col-12">
