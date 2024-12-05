@@ -81,6 +81,24 @@ if (isset($_POST['submit'])) {
 </div>
 
 <h6 class="mb-0 text-uppercase">Satuan</h6>
+<!-- Modal Konfirmasi Delete -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus satuan ini?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <a href="#" id="confirmDelete" class="btn btn-danger">Hapus</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <hr />
@@ -136,9 +154,11 @@ if (isset($_POST['submit'])) {
                                     <i class="bx bxs-edit"></i> Edit
                                 </button>
                                 <!-- Tombol Hapus dengan ikon -->
-                                <a href="index.php?page=delete_satuan&id=<?= $data['satuan'] ?>" class="btn btn-danger btn-sm" onClick="return confirm('Delete This?')">
+                                <a href="#" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<?= $data['satuan'] ?>" onclick="setDeleteId(<?= $data['satuan'] ?>)">
+                                    <i class="bx bxs-trash"></i> Hapus</a>
+                                <!-- <a href="index.php?page=delete_satuan&id=<?= $data['satuan'] ?>" class="btn btn-danger btn-sm" onClick="return confirm('Delete This?')">
                                     <i class="bx bxs-trash"></i> Hapus
-                                </a>
+                                </a> -->
                             </td>
                         </tr>
 
@@ -178,3 +198,11 @@ if (isset($_POST['submit'])) {
         </div>
     </div>
 </div>
+
+
+<script>
+    function setDeleteId(id) {
+        const deleteUrl = `index.php?page=delete_satuan&id=${id}`;
+        document.getElementById('confirmDelete').setAttribute('href', deleteUrl);
+    }
+</script>

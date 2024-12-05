@@ -99,9 +99,8 @@ $data = mysqli_fetch_assoc($result);
         <div class="card">
             <div class="card-body">
                 <div class="row align-items-center">
-                    <div class="col-lg-3 col-xl-2">
-                        <!-- <a class="btn btn-primary mb-3 mb-lg-0"><i class='bx bxs-home-circle'></i>Dashboard</a> -->
-                        <div class="filter-container d-flex align-items-center gap-3">
+                    <div class="col-lg-5 col-xl-2">
+                        <div class="filter-container d-flex flex-wrap gap-3">
                             <div class="form-group mb-0">
                                 <label for="filterType" class="form-label">Pilih Filter:</label>
                                 <select id="filterType" class="form-control" onchange="updateFilterOptions()">
@@ -113,7 +112,7 @@ $data = mysqli_fetch_assoc($result);
                             </div>
                             <div class="form-group mb-0" style="width: 120px;">
                                 <label id="filterOptionsLabel" for="filterOptions" class="form-label">Opsi:</label>
-                                <select id="filterOptions" class="form-control" style="width: 120px; z-index: 100">
+                                <select id="filterOptions" class="form-control" style="width: 120px;">
                                     <option value="all">-</option>
                                 </select>
                             </div>
@@ -122,7 +121,7 @@ $data = mysqli_fetch_assoc($result);
                             <button class="btn btn-primary" onclick="filterTable()">Filter</button>
                         </div>
                     </div>
-                    <div class="col-lg-9 col-xl-10">
+                    <div class="col-lg-5 col-xl-8 ms-auto">
                         <form class="float-lg-end">
                             <div class="row row-cols-lg-auto g-2">
                                 <div class="col-12">

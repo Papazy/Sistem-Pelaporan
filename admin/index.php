@@ -45,7 +45,7 @@ date_default_timezone_set('Asia/Jakarta');
 	<!--wrapper-->
 	<div class="wrapper">
 		<!--sidebar wrapper -->
-		<div class="sidebar-wrapper" data-simplebar="true">
+		<div class="sidebar-wrapper" data-simplebar="true" style="z-index: 10002;">
 			<div class="sidebar-header">
 				<div>
 					<img src="../assets/images/bidtik.png" width="50px" height="50px" alt="logo icon">
