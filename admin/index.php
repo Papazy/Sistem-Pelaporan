@@ -403,7 +403,7 @@ date_default_timezone_set('Asia/Jakarta');
 				case '4': // Terima
 					message = 'Laporan Diterima!';
 					headerColor = 'bg-success'; // Hijau
-					iconColor = 'red';
+					iconColor = 'green';
 					break;
 				case '5': // Tolak
 					message = 'Laporan Ditolak!';
