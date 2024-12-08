@@ -571,7 +571,7 @@ date_default_timezone_set('Asia/Jakarta');
 			$(document).ready(function() {
 				var table = $('#example2').DataTable({
 					lengthChange: false,
-					buttons: [ 'copy', 'excel', 'pdf', {
+					buttons: [ 'copy', 	'excel', {
               extend: 'print',
               exportOptions: {
                 stripHtml: false,

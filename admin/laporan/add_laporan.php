@@ -98,7 +98,7 @@ if (isset($_POST['submit'])) {
                         <div class="row mb-3">
                             <label for="mytextarea" class="col-sm-3 col-form-label">Peserta</label>
                             <div class="col-sm-9">
-                            <textarea id="mytextarea" name="mytextarea"></textarea>
+                            <textarea id="" name="mytextarea"></textarea>
                             </div>
                         </div>
                         <div class="row">

@@ -371,7 +371,7 @@ date_default_timezone_set('Asia/Jakarta');
 	<script src="../assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
 	<script src="../assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
 	<script src="../assets/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
-	<script src='https://cdn.tiny.cloud/1/vdqx2klew412up5bcbpwivg1th6nrh3murc6maz8bukgos4v/tinymce/5/tinymce.min.js' referrerpolicy="origin"></script>
+	<script src="../assets/plugins/tinymce/tinymce.min.js"></script>
 	<script src="../assets/plugins/fancy-file-uploader/jquery.ui.widget.js"></script>
 	<script src="../assets/plugins/fancy-file-uploader/jquery.fileupload.js"></script>
 	<script src="../assets/plugins/fancy-file-uploader/jquery.iframe-transport.js"></script>
